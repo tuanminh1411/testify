@@ -1,6 +1,7 @@
 // src/components/AddNewTest2.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { useQuiz } from "../../QuizContext";
 import "./AddNewTest2.css";
 
@@ -8,6 +9,19 @@ function AddNewTest2() {
   const { quizData, setQuizData } = useQuiz();
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
+
+  // Khi component mount, load dữ liệu từ localStorage nếu có
+  useEffect(() => {
+    const savedQuizData = localStorage.getItem("quizData");
+    if (savedQuizData) {
+      setQuizData(JSON.parse(savedQuizData));
+    }
+  }, [setQuizData]);
+
+  // Lưu quizData vào localStorage mỗi khi nó thay đổi
+  useEffect(() => {
+    localStorage.setItem("quizData", JSON.stringify(quizData));
+  }, [quizData]);
 
   // Cập nhật nội dung câu hỏi
   const updateQuestionText = (value) => {
@@ -31,8 +45,18 @@ function AddNewTest2() {
     setQuizData({ ...quizData, questions: updated });
   };
 
-  const handleFinish = () => {
-    navigate("/onclass-viewtest");
+  const handleFinish = async () => {
+    try {
+      // Gửi dữ liệu câu hỏi tới server sử dụng axios (đường dẫn API chỉ là ví dụ)
+      await axios.post("https://api.example.com/save-quiz", quizData.questions, {
+        headers: { "Content-Type": "application/json" },
+      });
+      // Sau khi lưu, chuyển hướng tới trang xem bài test
+      navigate("/onclass-viewtest");
+    } catch (error) {
+      console.error("Lỗi khi lưu dữ liệu:", error);
+      // Xử lý lỗi nếu cần, ví dụ hiển thị thông báo lỗi cho người dùng
+    }
   };
 
   return (
@@ -44,13 +68,11 @@ function AddNewTest2() {
       <div className="question-list">
         <ul>
           {quizData.questions.map((q, index) => {
-            // Kiểm tra xem câu đã “nhập đủ” hay chưa
+            // Kiểm tra xem câu đã “nhập đủ” hay hongg
             const isCompleted =
               q.question.trim() !== "" &&
               q.options.every((opt) => opt.trim() !== "");
             
-            // Nếu index == currentQuestion => class "selected"
-            // Nếu câu đã nhập đủ => class "completed"
             return (
               <li
                 key={index}
@@ -116,3 +138,4 @@ function AddNewTest2() {
 }
 
 export default AddNewTest2;
+      
