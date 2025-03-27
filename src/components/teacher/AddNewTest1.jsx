@@ -1,8 +1,9 @@
 // src/components/AddNewTest1.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuiz } from "../../QuizContext";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { FaBook, FaHeadset, FaBell, FaSignOutAlt, FaCog } from "react-icons/fa";
 import "./AddNewTest1.css";
 
@@ -10,43 +11,73 @@ function AddNewTest1() {
   const navigate = useNavigate();
   const { quizData, setQuizData } = useQuiz();
 
-  const [title, setTitle] = useState(quizData.title);
-  const [deadline, setDeadline] = useState(quizData.deadline);
-  const [duration, setDuration] = useState(quizData.duration);
-  const [totalQuestions, setTotalQuestions] = useState(quizData.totalQuestions);
-  const [description, setDescription] = useState(quizData.description);
+  const [title, setTitle] = useState(quizData.title || "");
+  const [deadline, setDeadline] = useState(quizData.deadline || "");
+  const [duration, setDuration] = useState(quizData.duration || 0);
+  const [totalQuestions, setTotalQuestions] = useState(quizData.totalQuestions || 0);
+  const [description, setDescription] = useState(quizData.description || "");
   const [errors, setErrors] = useState({});
 
+  // Load dữ liệu từ localStorage nếu có để pre-populate form
+  useEffect(() => {
+    const savedQuizData = localStorage.getItem("quizData");
+    if (savedQuizData) {
+      const parsedData = JSON.parse(savedQuizData);
+      setTitle(parsedData.title || "");
+      setDeadline(parsedData.deadline || "");
+      setDuration(parsedData.duration || 0);
+      setTotalQuestions(parsedData.totalQuestions || 0);
+      setDescription(parsedData.description || "");
+    }
+  }, []);
 
-  const handleContinue = (e) => {
+  const handleContinue = async (e) => {
     e.preventDefault();
     let newErrors = {};
     if (!title.trim()) newErrors.title = "Vui lòng nhập tiêu đề";
     if (!deadline.trim()) newErrors.deadline = "Vui lòng chọn ngày hết hạn";
     if (!duration || isNaN(duration) || duration <= 0) newErrors.duration = "Vui lòng nhập thời gian hợp lệ";
-    if (!totalQuestions || isNaN(totalQuestions) || totalQuestions <= 0) newErrors.totalQuestions = "Vui lòng nhập số câu hỏi hợp lệ";
+    if (!totalQuestions || isNaN(totalQuestions) || totalQuestions <= 0)
+      newErrors.totalQuestions = "Vui lòng nhập số câu hỏi hợp lệ";
     if (!description.trim()) newErrors.description = "Vui lòng nhập mô tả";
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
+
     // Tạo mảng câu hỏi với số lượng tương ứng
-    const questionsArray = Array.from({ length: totalQuestions }, () => ({
+    const questionsArray = Array.from({ length: Number(totalQuestions) }, () => ({
       question: "",
       options: ["", "", "", ""],
       correctIndex: 0,
     }));
 
-    setQuizData({
-      ...quizData,
+    const quizInfo = {
       title: title,
       deadline: deadline,
       duration: duration,
       totalQuestions: Number(totalQuestions),
       questions: questionsArray,
       description: description,
-    });
+    };
 
-    navigate("/addnewtest2");
+    try {
+      // Gửi thông tin bài test tới server sử dụng axios (đường dẫn API chỉ là ví dụ)
+      const response = await axios.post(
+        "https://api.example.com/save-quiz-info",
+        quizInfo,
+        { headers: { "Content-Type": "application/json" } }
+      );
+      // Giả sử API trả về dữ liệu bài test đã lưu
+      const savedQuizData = response.data;
+      // Cập nhật dữ liệu vào context và lưu vào localStorage
+      setQuizData(savedQuizData);
+      localStorage.setItem("quizData", JSON.stringify(savedQuizData));
+      // Chuyển hướng sang trang nhập câu hỏi
+      navigate("/addnewtest2");
+    } catch (error) {
+      console.error("Lỗi khi lưu thông tin bài test:", error);
+      // Xử lý lỗi nếu cần, ví dụ hiển thị thông báo lỗi cho người dùng
+    }
   };
 
   const handleCancel = () => {
@@ -65,23 +96,23 @@ function AddNewTest1() {
           <img src="images/logo.jpg" alt="Logo" className="logo-image" />
         </div>
         <div className="settings-icon">
-          <FaCog className="function-icon"/>
+          <FaCog className="function-icon" />
         </div>
         <div className="function-icons">
           <Link to="/addnewtest1" className="icon-item active">
-            <FaBook className="function-icon"/>
+            <FaBook className="function-icon" />
             <p className="icon-description">Môn học</p>
           </Link>
           <Link to="/support" className="icon-item">
-            <FaHeadset className="function-icon"/>
+            <FaHeadset className="function-icon" />
             <p className="icon-description">Hỗ trợ</p>
           </Link>
           <Link to="/notification" className="icon-item">
-            <FaBell className="function-icon"/>
+            <FaBell className="function-icon" />
             <p className="icon-description">Thông báo</p>
           </Link>
           <Link to="/logout" className="icon-item">
-            <FaSignOutAlt className="function-icon"/>
+            <FaSignOutAlt className="function-icon" />
             <p className="icon-description">Đăng xuất</p>
           </Link>
         </div>
@@ -112,7 +143,6 @@ function AddNewTest1() {
             {errors.title && <p className="error-message">{errors.title}</p>}
           </div>
           
-
           <div className="input-group">
             <label htmlFor="duration">Thời Gian Làm Bài</label>
             <input
@@ -160,3 +190,4 @@ function AddNewTest1() {
 }
 
 export default AddNewTest1;
+    
