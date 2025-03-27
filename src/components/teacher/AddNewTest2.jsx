@@ -9,8 +9,9 @@ function AddNewTest2() {
   const { quizData, setQuizData } = useQuiz();
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [finished, setFinished] = useState(false);
 
-  // Khi component mount, load dữ liệu từ localStorage nếu có
+  // Load dữ liệu từ localStorage nếu có
   useEffect(() => {
     const savedQuizData = localStorage.getItem("quizData");
     if (savedQuizData) {
@@ -47,18 +48,44 @@ function AddNewTest2() {
 
   const handleFinish = async () => {
     try {
-      // Gửi dữ liệu câu hỏi tới server sử dụng axios (đường dẫn API chỉ là ví dụ)
+      // Gửi dữ liệu câu hỏi và đáp án tới server sử dụng axios (đường dẫn API chỉ là ví dụ)
       await axios.post("https://api.example.com/save-quiz", quizData.questions, {
         headers: { "Content-Type": "application/json" },
       });
-      // Sau khi lưu, chuyển hướng tới trang xem bài test
-      navigate("/onclass-viewtest");
+      // Sau khi gửi dữ liệu, thay vì chuyển trang, em bé set finished = true để hiển thị summary
+      setFinished(true);
     } catch (error) {
       console.error("Lỗi khi lưu dữ liệu:", error);
       // Xử lý lỗi nếu cần, ví dụ hiển thị thông báo lỗi cho người dùng
     }
   };
 
+  // Nếu đã hoàn tất, hiển thị danh sách câu hỏi và đáp án
+  if (finished) {
+    return (
+      <div className="summary-container">
+        <h2>Danh sách câu hỏi và đáp án</h2>
+        <ul>
+          {quizData.questions.map((q, index) => (
+            <li key={index}>
+              <h3>
+                Câu {index + 1}: {q.question}
+              </h3>
+              <ul>
+                {q.options.map((option, idx) => (
+                  <li key={idx}>
+                    {String.fromCharCode(65 + idx)}: {option}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  // Giao diện nhập câu hỏi và đáp án
   return (
     <div className="test2-container">
       <div className="timer">
@@ -68,7 +95,7 @@ function AddNewTest2() {
       <div className="question-list">
         <ul>
           {quizData.questions.map((q, index) => {
-            // Kiểm tra xem câu đã “nhập đủ” hay hongg
+            // Kiểm tra xem câu đã nhập đủ hay hongg
             const isCompleted =
               q.question.trim() !== "" &&
               q.options.every((opt) => opt.trim() !== "");
@@ -138,4 +165,4 @@ function AddNewTest2() {
 }
 
 export default AddNewTest2;
-      
+        
