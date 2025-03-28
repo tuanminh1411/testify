@@ -1,0 +1,154 @@
+/* Định dạng chung */
+.homescreen-body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    font-size: medium;
+    display: flex;
+    height: 100vh;
+    background-color: #2c3e50;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 80px;
+  background-color: black;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  position: fixed;
+}
+  
+  .logo-image {
+    width: 50px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+  
+  }
+  
+  .settings-icon {
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+    margin-bottom: 120px;
+  }
+
+  .function-icons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .icon-item {
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+    padding: 10px 0;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .function-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+  }
+  
+  .function-icon {
+    color: #9ca3af;
+    font-size: 24px;
+    transition: transform 0.2s ease, color 0.3s ease;
+    z-index: 2;
+  }
+  
+  .icon-description {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 5px;
+  }
+  
+  .icon-item:hover .icon-item.active {
+    transform: scale(1.1);
+  }
+
+  .icon-item:hover .function-icon-container{
+    background-color: #00ffcc;
+  }
+  
+  .icon-item:hover .function-icon, .icon-item.active .function-icon {
+    color: #00ffcc;
+  }
+
+  .icon-item:hover .icon-description, .icon-item.active .icon-description {
+    color: #00ffcc;
+  }
+
+
+/* Nội dung chính */
+.homescreen-content {
+    flex-grow: 1;
+    background-color: #2c3e50;
+    padding: 20px;
+}
+
+.header-hm {
+    font-size: 50px;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Grid môn học */
+.subject-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 0 50px;
+}
+
+.subject-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin: 30px;
+}
+
+.subject-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.subject-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.subject-card .info {
+    padding: 15px;
+}
+
+.subject-card .info h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.subject-card .info p {
+    font-size: 14px;
+    color: #2c3e50;
+}

@@ -1,0 +1,164 @@
+.test-screen-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #2c3e50;
+    color: white;
+    height: 100vh;
+    padding: 20px;
+  }
+  
+  .timer {
+    background-color: #111827;
+    padding: 10px 20px;
+    border-radius: 10px;
+    color: #00ffcc;
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    font-size: 38px;
+    margin-bottom: 20px;
+  }
+  
+  .question-card {
+    background-color: #111827;
+    padding: 20px;
+    border-radius: 10px;
+    width: 800px;
+    margin-top: 80px;
+  }
+  
+  .option {
+    margin: 8px 0;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 20px;
+  }
+  
+  .option:hover {
+    background-color: #222;
+  }
+  
+  .option.selected {
+    background-color: #00ffcc;
+    color: black;
+  }
+  
+  .navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .navigation-buttons button {
+    background-color: transparent;
+    color: #00ffcc;
+    border: 2px solid #00ffcc;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .question-list {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background-color: #111827;
+    padding: 10px;
+    width: 120px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .question-list ul li.completed {
+    color: #00ffcc;
+    font-weight: bold;
+  }
+  
+  .question-list ul li.selected {
+    background-color: #00ffcc;
+    color: black;
+  }
+  
+  /* Hộp thoại xác nhận */
+.confirm-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+  }
+  
+  .confirm-dialog-content {
+    background-color: #111827;
+    padding: 20px;
+    border-radius: 12px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  }
+  
+  .confirm-dialog-content p {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  
+  /* Nút trong hộp thoại */
+  .confirm-dialog-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+  }
+  
+  .confirm-button,
+  .cancel-button {
+    background-color: transparent;
+    color: white;
+    border: 2px solid #00ffcc;
+    padding: 10px 32px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Hiệu ứng hover khi di chuột vào nút */
+  .confirm-button:hover {
+    background-color: #00ffcc;
+    color: black;
+  }
+  
+  .cancel-button:hover {
+    background-color: #f87171;
+    color: white;
+  }
+  
+  .submit-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: transparent;
+    color: #00ffcc;
+    border: 2px solid #00ffcc;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #00ffcc;
+    color: black;
+  }
