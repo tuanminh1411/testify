@@ -22,7 +22,7 @@ function App() {
     <BrowserRouter>
       <Routes> 
 
-        <Route path="/" element={<LoginForm />} />
+        <Route path="/login" element={<LoginForm />} />
 
         <Route path="/home" element={<HomeScreen />} />
         <Route path="/addnewtest1" element={<AddNewTest1 />} />
@@ -36,7 +36,7 @@ function App() {
         <Route path="/test-result" element={<TestResult />} />
 
         <Route path="/createteacher" element={<CreateTeacher />} />
-        <Route path="/createstudent" element={<CreateStudent />} />
+        <Route path="/" element={<CreateStudent />} />
       </Routes>
     </BrowserRouter>
   );
