@@ -1,6 +1,6 @@
 // src/components/AddNewTest2.jsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useQuiz } from "../../QuizContext";
 import "./AddNewTest2.css";
@@ -8,20 +8,29 @@ import "./AddNewTest2.css";
 function AddNewTest2() {
   const { quizData, setQuizData } = useQuiz();
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [finished, setFinished] = useState(false);
 
-  // Load dữ liệu từ localStorage nếu có
+  // Nạp dữ liệu từ location.state nếu có, hoặc từ localStorage nếu context đang rỗng
   useEffect(() => {
-    const savedQuizData = localStorage.getItem("quizData");
-    if (savedQuizData) {
-      setQuizData(JSON.parse(savedQuizData));
+    if (!quizData || !quizData.questions || quizData.questions.length === 0) {
+      if (location.state) {
+        setQuizData(location.state);
+      } else {
+        const savedQuizData = localStorage.getItem("quizData");
+        if (savedQuizData) {
+          setQuizData(JSON.parse(savedQuizData));
+        }
+      }
     }
-  }, [setQuizData]);
+  }, [quizData, location, setQuizData]);
 
   // Lưu quizData vào localStorage mỗi khi nó thay đổi
   useEffect(() => {
-    localStorage.setItem("quizData", JSON.stringify(quizData));
+    if (quizData) {
+      localStorage.setItem("quizData", JSON.stringify(quizData));
+    }
   }, [quizData]);
 
   // Cập nhật nội dung câu hỏi
@@ -46,21 +55,20 @@ function AddNewTest2() {
     setQuizData({ ...quizData, questions: updated });
   };
 
+  // Khi ấn nút Hoàn Tất, gửi dữ liệu qua axios và hiển thị summary
   const handleFinish = async () => {
     try {
-      // Gửi dữ liệu câu hỏi và đáp án tới server sử dụng axios (đường dẫn API chỉ là ví dụ)
       await axios.post("https://api.example.com/save-quiz", quizData.questions, {
         headers: { "Content-Type": "application/json" },
       });
-      // Sau khi gửi dữ liệu, thay vì chuyển trang, em bé set finished = true để hiển thị summary
       setFinished(true);
     } catch (error) {
       console.error("Lỗi khi lưu dữ liệu:", error);
-      // Xử lý lỗi nếu cần, ví dụ hiển thị thông báo lỗi cho người dùng
+      // Xử lý lỗi nếu cần, ví dụ hiển thị thông báo cho người dùng
     }
   };
 
-  // Nếu đã hoàn tất, hiển thị danh sách câu hỏi và đáp án
+  // Nếu đã hoàn tất, hiển thị danh sách câu hỏi và đáp án cùng nút navigate
   if (finished) {
     return (
       <div className="summary-container">
@@ -81,6 +89,9 @@ function AddNewTest2() {
             </li>
           ))}
         </ul>
+        <button onClick={() => navigate("/onclass-viewtest")}>
+          Tiếp Tục
+        </button>
       </div>
     );
   }
@@ -99,14 +110,12 @@ function AddNewTest2() {
             const isCompleted =
               q.question.trim() !== "" &&
               q.options.every((opt) => opt.trim() !== "");
-            
             return (
               <li
                 key={index}
-                className={`
-                  ${currentQuestion === index ? "selected" : ""}
-                  ${isCompleted ? "completed" : ""}
-                `}
+                className={`${currentQuestion === index ? "selected" : ""} ${
+                  isCompleted ? "completed" : ""
+                }`}
                 onClick={() => setCurrentQuestion(index)}
               >
                 Câu {index + 1}
@@ -165,4 +174,3 @@ function AddNewTest2() {
 }
 
 export default AddNewTest2;
-        

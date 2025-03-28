@@ -1,9 +1,8 @@
 // src/components/AddNewTest1.jsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQuiz } from "../../QuizContext";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { useQuiz } from "../../QuizContext";
 import { FaBook, FaHeadset, FaBell, FaSignOutAlt, FaCog } from "react-icons/fa";
 import "./AddNewTest1.css";
 
@@ -63,7 +62,7 @@ function AddNewTest1() {
     try {
       // Gửi thông tin bài test tới server sử dụng axios (đường dẫn API chỉ là ví dụ)
       const response = await axios.post(
-        "https://api.example.com/save-quiz-info",
+        "http://localhost:5026/api/Quiz",
         quizInfo,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -72,8 +71,8 @@ function AddNewTest1() {
       // Cập nhật dữ liệu vào context và lưu vào localStorage
       setQuizData(savedQuizData);
       localStorage.setItem("quizData", JSON.stringify(savedQuizData));
-      // Chuyển hướng sang trang nhập câu hỏi
-      navigate("/addnewtest2");
+      // Sử dụng navigate state để truyền dữ liệu qua route tiếp theo
+      navigate("/addnewtest2", { state: savedQuizData });
     } catch (error) {
       console.error("Lỗi khi lưu thông tin bài test:", error);
       // Xử lý lỗi nếu cần, ví dụ hiển thị thông báo lỗi cho người dùng
@@ -190,4 +189,3 @@ function AddNewTest1() {
 }
 
 export default AddNewTest1;
-    
