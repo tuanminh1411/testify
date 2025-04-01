@@ -7,17 +7,23 @@ const LoginForm = () => {
   const [Password, setPassword] = useState('');
  
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Ngăn chặn hành động mặc định của form  
- 
+    event.preventDefault(); // Ngăn chặn hành động mặc định của form
+  
+    console.log('Username:', UserName);
+    console.log('Password:', Password);
+  
     try {
       const response = await axios.post('http://localhost:5026/api/Login/Login', {
         UserName, // Gửi username
         Password, // Gửi password
       });
-
+  
       console.log('Phản hồi từ API:', response.data); // Kiểm tra phản hồi
+  
+      if (response.status === 200) {
+        // Lưu thông tin vào local storage
+        localStorage.setItem('accessToken', response.data);
 
-      if (response.data.success) {
         alert('Đăng nhập thành công: ' + response.data.message);
       } else {
         alert('Đăng nhập không thành công: ' + response.data.message);
@@ -118,10 +124,10 @@ const LoginForm = () => {
  
         <form onSubmit={handleSubmit}>
           <div style={styles.inputGroup}>
-            <label htmlFor="id" style={styles.label}>ID</label>
+            <label htmlFor="UserName" style={styles.label}>ID</label>
             <input
               type="text"
-              id="id"
+              id="UserName"
               value={UserName}
               onChange={(e) => setId(e.target.value)}
               style={styles.inputField}
@@ -130,10 +136,10 @@ const LoginForm = () => {
           </div>
  
           <div style={styles.inputGroup}>
-            <label htmlFor="password" style={styles.label}>Password</label>
+            <label htmlFor="Password" style={styles.label}>Password</label>
             <input
-              type="password"
-              id="password"
+              type="Password"
+              id="Password"
               value={Password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.inputField}

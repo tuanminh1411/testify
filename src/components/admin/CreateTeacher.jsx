@@ -1,47 +1,47 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Select from "react-select";
+import axios from "axios";
 import { FaBook, FaHeadset, FaBell, FaSignOutAlt, FaCog } from "react-icons/fa";
 import "./CreateTeacher.css";
 
 function CreateTeacher() {
   const navigate = useNavigate();
   const [teacherData, setTeacherData] = useState({
-    id: "",
     name: "",
-    gender: "Nam",
-    dob: "",
-    phone: "",
-    subject: "",
-    classes: [],
+    gender: { value: "Nam", label: "Nam" },
+    birthDate: "",
+    phoneNumber: "",
+    email: "",
+    subject: null, // sẽ chuyển thành subjectID khi gửi API
+    image: "", // URL của ảnh sau upload
   });
-
   const [errors, setErrors] = useState({});
+  const [subjectOptions, setSubjectOptions] = useState([]);
+  const [imageFile, setImageFile] = useState(null);
 
+  // Danh sách lựa chọn giới tính
   const genderOptions = [
     { value: "Nam", label: "Nam" },
     { value: "Nữ", label: "Nữ" },
   ];
 
-  const subjectOptions = [
-    { value: "Toán học", label: "Toán học" },
-    { value: "Ngữ Văn", label: "Ngữ Văn" },
-    { value: "Tiếng Anh", label: "Tiếng Anh" },
-    { value: "Địa Lý", label: "Địa Lý" },
-    { value: "Sinh Học", label: "Sinh Học" },
-    { value: "Lịch Sử", label: "Lịch Sử" },
-    { value: "Vật Lý", label: "Vật Lý" },
-    { value: "Hóa Học", label: "Hóa Học" },
-    { value: "Giáo Dục Công Dân", label: "Giáo Dục Công Dân" },
-  ];
-
-  const classOptions =[
-    {value: "4A1", label: "4A1" },
-    {value: "4A2", label: "4A2" },
-    {value: "4B1", label: "4B1" },
-    {value: "4B2", label: "4B2" },
-  ];
+  // Lấy danh sách môn học từ API
+  useEffect(() => {
+    axios
+      .get("https://api.example.com/subjects")
+      .then((response) => {
+        // Giả sử API trả về mảng đối tượng với các trường id và name
+        const options = response.data.map((subject) => ({
+          value: subject.id,
+          label: subject.name,
+        }));
+        setSubjectOptions(options);
+      })
+      .catch((error) => {
+        console.error("Lỗi khi tải danh sách môn học:", error);
+      });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,42 +51,75 @@ function CreateTeacher() {
   const handlePhoneChange = (e) => {
     let value = e.target.value.replace(/\D+/g, "");
     if (value.length > 10) {
-        value = value.slice(0, 10);
+      value = value.slice(0, 10);
     }
-    setTeacherData({ ...teacherData, phone: value });
-}
-
-  const handleSelectChange = (selectedOption, action) => {
-      setTeacherData({
-          ...teacherData,
-          [action.name]: selectedOption
-      })
+    setTeacherData({ ...teacherData, phoneNumber: value });
   };
 
-  const handleClassChange = (selectedOptions) => {
-    setTeacherData({ 
-        ...teacherData,
-        classes: selectedOptions?selectedOptions.map((option) => option.value):[],
+  const handleSelectChange = (selectedOption, action) => {
+    setTeacherData({
+      ...teacherData,
+      [action.name]: selectedOption,
     });
   };
 
-  const handleSubmit = (e) => {
+  // Xử lý chọn file ảnh
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let newErrors = {};
-
-    if (!teacherData.id.trim()) newErrors.id = "Vui lòng nhập ID";
     if (!teacherData.name.trim()) newErrors.name = "Vui lòng nhập họ và tên";
-    if (!teacherData.dob) newErrors.dob = "Vui lòng chọn ngày sinh";
-    if (!teacherData.phone.trim()) newErrors.phone = "Vui lòng nhập số điện thoại";
-    if (!teacherData.subject) newErrors.subject = "Vui lòng chọn môn";
-    if (teacherData.classes.length === 0) newErrors.classes = "Vui lòng chọn ít nhất một lớp";
+    if (!teacherData.birthDate) newErrors.birthDate = "Vui lòng chọn ngày sinh";
+    if (!teacherData.phoneNumber.trim()) newErrors.phoneNumber = "Vui lòng nhập số điện thoại";
+    if (!teacherData.email.trim()) newErrors.email = "Vui lòng nhập email";
+    if (!teacherData.subject) newErrors.subject = "Vui lòng chọn môn học";
+    if (!teacherData.gender) newErrors.gender = "Vui lòng chọn giới tính";
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    // Lưu dữ liệu vào database hoặc thực hiện API call tại đây nè!
+    try {
+      let uploadedImageUrl = "";
+      // Nếu có file ảnh, thực hiện upload
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("file", imageFile);
+        const uploadResponse = await axios.post(
+          "https://api.example.com/upload",
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        // Giả sử API trả về { url: "đường dẫn ảnh" }
+        uploadedImageUrl = uploadResponse.data.url;
+      }
 
-    navigate("/teachers");
+      const payload = {
+        name: teacherData.name,
+        phoneNumber: teacherData.phoneNumber,
+        subjectID: teacherData.subject.value, // lấy subjectID từ selected option
+        birthDate: new Date(teacherData.birthDate).toISOString(),
+        gender: teacherData.gender.value,
+        image: uploadedImageUrl,
+        firstLogin: new Date().toISOString(),
+        email: teacherData.email,
+      };
+
+      const response = await axios.post(
+        "https://api.example.com/teachers",
+        payload,
+        { headers: { "Content-Type": "application/json" } }
+      );
+      console.log("Teacher created:", response.data);
+      navigate("/teachers");
+    } catch (error) {
+      console.error("Lỗi khi tạo giáo viên:", error);
+      // Em bé có thể hiển thị thông báo lỗi cho người dùng nếu cần nè!
+    }
   };
 
   return (
@@ -96,23 +129,23 @@ function CreateTeacher() {
           <img src="images/logo.jpg" alt="Logo" className="logo-image" />
         </div>
         <div className="settings-icon">
-          <FaCog className="function-icon"/>
+          <FaCog className="function-icon" />
         </div>
         <div className="function-icons">
           <Link to="/subjects" className="icon-item">
-            <FaBook className="function-icon"/>
+            <FaBook className="function-icon" />
             <p className="icon-description">Môn học</p>
           </Link>
           <Link to="/support" className="icon-item">
-            <FaHeadset className="function-icon"/>
+            <FaHeadset className="function-icon" />
             <p className="icon-description">Hỗ trợ</p>
           </Link>
           <Link to="/notifications" className="icon-item">
-            <FaBell className="function-icon"/>
+            <FaBell className="function-icon" />
             <p className="icon-description">Thông báo</p>
           </Link>
           <Link to="/logout" className="icon-item">
-            <FaSignOutAlt className="function-icon"/>
+            <FaSignOutAlt className="function-icon" />
             <p className="icon-description">Đăng xuất</p>
           </Link>
         </div>
@@ -123,14 +156,13 @@ function CreateTeacher() {
           <h2>Thêm giáo viên</h2>
           <form onSubmit={handleSubmit}>
             <div className="input-group">
-              <label>ID:</label>
-              <input type="text" name="id" value={teacherData.id} onChange={handleChange} />
-              {errors.id && <p className="error-message">{errors.id}</p>}
-            </div>
-
-            <div className="input-group">
               <label>Họ và tên:</label>
-              <input type="text" name="name" value={teacherData.name} onChange={handleChange} />
+              <input
+                type="text"
+                name="name"
+                value={teacherData.name}
+                onChange={handleChange}
+              />
               {errors.name && <p className="error-message">{errors.name}</p>}
             </div>
 
@@ -144,22 +176,46 @@ function CreateTeacher() {
                 onChange={handleSelectChange}
                 name="gender"
               />
+              {errors.gender && <p className="error-message">{errors.gender}</p>}
+            </div>
+
+            <div className="input-group">
+              <label>Email:</label>
+              <input
+                type="email"
+                name="email"
+                value={teacherData.email}
+                onChange={handleChange}
+              />
+              {errors.email && <p className="error-message">{errors.email}</p>}
             </div>
 
             <div className="input-group">
               <label>Ngày sinh:</label>
-              <input type="date" name="dob" value={teacherData.dob} onChange={handleChange} />
-              {errors.dob && <p className="error-message">{errors.dob}</p>}
+              <input
+                type="date"
+                name="birthDate"
+                value={teacherData.birthDate}
+                onChange={handleChange}
+              />
+              {errors.birthDate && <p className="error-message">{errors.birthDate}</p>}
             </div>
 
             <div className="input-group">
               <label>Số điện thoại:</label>
-              <input type="number" name="phone" value={teacherData.phone} onChange={handlePhoneChange} maxLength={10} onInput={(e) => e.target.value = e.target.value.slice(0, 10)} />
-              {errors.phone && <p className="error-message">{errors.phone}</p>}
+              <input
+                type="number"
+                name="phoneNumber"
+                value={teacherData.phoneNumber}
+                onChange={handlePhoneChange}
+                maxLength={10}
+                onInput={(e) => (e.target.value = e.target.value.slice(0, 10))}
+              />
+              {errors.phoneNumber && <p className="error-message">{errors.phoneNumber}</p>}
             </div>
 
             <div className="input-group">
-              <label>Môn:</label>
+              <label>Môn học:</label>
               <Select
                 className="select-container"
                 classNamePrefix="select"
@@ -173,17 +229,13 @@ function CreateTeacher() {
             </div>
 
             <div className="input-group">
-              <label>Lớp:</label>
-              <Select
-                className="select-container"
-                classNamePrefix="select" 
-                isMulti
-                options={classOptions}
-                value={classOptions.filter(option => teacherData.classes.includes(option.value))}
-                onChange={handleClassChange}
-                placeholder="Chọn lớp..."
+              <label>Ảnh:</label>
+              <input
+                type="file"
+                name="image"
+                onChange={handleFileChange}
+                accept="image/*"
               />
-              {errors.classes && <p className="error-message">{errors.classes}</p>}
             </div>
 
             <div className="buttons">
