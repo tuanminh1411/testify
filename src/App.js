@@ -22,10 +22,10 @@ function App() {
     <BrowserRouter>
       <Routes> 
 
-        <Route path="/" element={<LoginForm />} />
+        <Route path="/login" element={<LoginForm />} />
 
         <Route path="/home" element={<HomeScreen />} />
-        <Route path="/addnewtest1" element={<AddNewTest1 />} />
+        <Route path="/" element={<AddNewTest1 />} />
         <Route path="/addnewtest2" element={<AddNewTest2 />} />
         <Route path="/onclass-viewtest" element={<OnClassViewTest />} />
         <Route path="/support" element={<SupportScreen />} />
